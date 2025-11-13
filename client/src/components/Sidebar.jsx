@@ -1,44 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { menuItems } from "../config/menuConfig";
+import { FaBars } from "react-icons/fa";
 
 const Sidebar = () => {
+  const [open, setOpen] = useState(true);
+
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900 h-screen shadow-lg fixed left-0 top-0 p-4 flex flex-col justify-between transition-colors">
-      
-      {/* App Branding */}
-      <div>
-        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-cyan-500 to-teal-500 bg-clip-text text-transparent">
-          FinanceMate
-        </h2>
-
-        {/* Navigation Menu */}
-        <ul className="mt-10 space-y-3">
-          {menuItems.map((item, idx) => (
-            <li key={idx}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition-all ${
-                    isActive
-                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-md"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  }`
-                }
-              >
-                {item.icon} 
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Logout Button */}
-      <button className="mt-auto px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition">
-        Logout
+    <div
+      className={`${
+        open ? "w-64" : "w-20"
+      } duration-300 bg-teal-600 dark:bg-teal-800 text-white px-4 py-6 flex flex-col`}
+    >
+      {/* Toggle Button */}
+      <button
+        className="text-xl mb-8 hover:scale-110 transition-transform"
+        onClick={() => setOpen(!open)}
+      >
+        <FaBars />
       </button>
-    </aside>
+
+      {/* Menu List */}
+      <ul className="flex flex-col gap-3">
+        {menuItems.map((item, i) => (
+          <li key={i}>
+            <NavLink
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all
+                 ${isActive
+                   ? "bg-teal-700 text-white"
+                   : "text-gray-200 hover:bg-teal-700 hover:text-white dark:hover:bg-teal-900"}`
+              }
+            >
+              <span className="text-lg">{item.icon}</span>
+              {open && (
+                <span className="text-sm font-medium tracking-wide">
+                  {item.label}
+                </span>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

@@ -18,7 +18,7 @@ const Topbar = () => {
   }, [darkMode]);
 
   return (
-    <div className="flex justify-end items-center bg-white dark:bg-gray-800 px-4 py-3 shadow">
+    <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow px-6 py-3 flex justify-between items-center">
       <button
         onClick={() => setDarkMode(!darkMode)}
         className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 transition"

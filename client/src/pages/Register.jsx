@@ -1,7 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaPiggyBank } from "react-icons/fa";
-
+import { useNavigate } from "react-router-dom";
+import API from "../services/api";
 const Register = () => {
+  const [name,setname] = useState('');
+  const [email,setEmail] = useState('');
+  const [password,setPassword] = useState('');
+    const navigate = useNavigate();
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await API.post("/register", { email, password });
+      console.log(res);
+      navigate("/login");
+    } catch (err) {
+      alert(err.response?.data?.message || "Register failed");
+    }
+  };
+
+
+
   return (
     <div className="min-h-screen flex">
       {/* Left Section */}
@@ -22,14 +42,16 @@ const Register = () => {
             Create Account
           </h2>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label className="text-gray-700 dark:text-gray-300 text-sm">
                 Full Name
               </label>
               <input
                 type="text"
+                value={name}
                 className="w-full p-3 mt-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-green-500 outline-none"
+                onChange = {(e)=>setname(e.target.value)}
               />
             </div>
 
@@ -39,7 +61,9 @@ const Register = () => {
               </label>
               <input
                 type="email"
+                value={email}
                 className="w-full p-3 mt-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-green-500 outline-none"
+                onChange={(e)=>setEmail(e.target.value)}
               />
             </div>
 
@@ -49,11 +73,15 @@ const Register = () => {
               </label>
               <input
                 type="password"
+                value={password}
                 className="w-full p-3 mt-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-green-500 outline-none"
+                onChange={(e)=>setPassword(e.target.value)}
               />
             </div>
 
-            <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition">
+            <button 
+            type="submit"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition">
               Sign Up
             </button>
 

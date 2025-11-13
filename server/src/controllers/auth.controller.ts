@@ -2,6 +2,7 @@ import { PrismaClient } from "../generated/prisma/client";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
 export const prisma = new PrismaClient();
 
 export const register = async(req:Request,res:Response)=>{
@@ -18,7 +19,7 @@ export const register = async(req:Request,res:Response)=>{
             return res.status(401).json({message:'User Already Exists,Plese Login In'})
         }
         const hashedpassword = await bcrypt.hash(password,10)
-        const user = prisma.user.create({
+        const user = await prisma.user.create({
             data:{name,email,password:hashedpassword}
         })
         res.status(200).json({message:"User Added succesfully",user});

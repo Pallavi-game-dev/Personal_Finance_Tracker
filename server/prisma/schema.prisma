@@ -18,26 +18,40 @@ model User{
   id           Int           @id @default(autoincrement())
   email        String        @unique
   password     String
-  name         String?
+  name         String
+  token        String?
   transactions Transaction[]
   budgets      Budget[]
+  
 }
 
-
+model Category {
+  id        Int      @id @default(autoincrement())
+  category  String
+  transactions Transaction[]
+  budgets Budget[]
+}
+enum TransactionType {
+  DR
+  CR
+}
 model Transaction {
   id        Int      @id @default(autoincrement())
+  title    String
   amount    Float
-  category  String
+  category        Category @relation(fields: [category_id],references: [id])
+  category_id     Int
   date      DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  transaction_type   TransactionType 
 }
 
-
 model Budget {
-  id        Int      @id @default(autoincrement())
-  category  String
-  limit     Float
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  id              Int      @id @default(autoincrement())
+  category        Category @relation(fields: [category_id],references: [id])
+  category_id     Int
+  limit           Float
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
 }

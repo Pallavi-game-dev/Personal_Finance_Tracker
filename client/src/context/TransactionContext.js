@@ -20,9 +20,7 @@ export const TransactionProvider = ({ children }) => {
   const balance = income - expense;
 
   return (
-    <TransactionContext.Provider
-      value={{ transactions, addTransaction, income, expense, balance }}
-    >
+    <TransactionContext.Provider value={{ transactions, addTransaction, income, expense, balance }}>
       {children}
     </TransactionContext.Provider>
   );

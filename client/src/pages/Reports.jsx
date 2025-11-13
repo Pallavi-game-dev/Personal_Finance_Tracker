@@ -62,8 +62,8 @@ const Reports = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="flex justify-between items-center mb-6">
+  <>
+     <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold">Financial Reports</h1>
 
         <select
@@ -92,7 +92,7 @@ const Reports = () => {
           <Bar data={categoryBarData} />
         </div>
       </div>
-    </DashboardLayout>
+  </>
   );
 };
 
