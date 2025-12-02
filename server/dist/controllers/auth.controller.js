@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getdashborad = exports.getCategoris = exports.addCategoris = exports.getTransaction = exports.addTransaction = exports.login = exports.register = exports.prisma = void 0;
+exports.getDashboard = exports.getCategoris = exports.addCategoris = exports.getTransaction = exports.addTransaction = exports.login = exports.register = exports.prisma = void 0;
 const client_1 = require("../generated/prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -133,29 +133,34 @@ const getCategoris = async (req, res) => {
     }
 };
 exports.getCategoris = getCategoris;
-const getdashborad = async (req, res) => {
+const getDashboard = async (req, res) => {
     try {
         const userId = req.body.id;
-        const all_transactions = await exports.prisma.transaction.findMany({
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        // Query all transactions once
+        const transactions = await exports.prisma.transaction.findMany({
             where: { userId },
+            select: { amount: true, transaction_type: true }
         });
-        const incomeTransaction = all_transactions.filter((x) => x.transaction_type == 'CR');
         let totalIncome = 0;
-        incomeTransaction.forEach(x => {
-            totalIncome = +x.amount;
+        let totalExpense = 0;
+        transactions.forEach(t => {
+            if (t.transaction_type === "CR")
+                totalIncome += t.amount;
+            if (t.transaction_type === "DR")
+                totalExpense += t.amount;
         });
-        const expenceTransaction = all_transactions.filter((x) => x.transaction_type == 'DR');
-        let totalExpence = 0;
-        expenceTransaction.forEach(x => {
-            totalExpence = +x.amount;
+        const totalBalance = totalIncome - totalExpense;
+        return res.status(200).json({
+            message: "Data fetched successfully",
+            data: { totalIncome, totalExpense, totalBalance }
         });
-        const totalBalance = totalIncome - totalExpence;
-        let data = { totalIncome, totalExpence, totalBalance };
-        res.status(200).json({ message: '', data });
     }
     catch (error) {
         console.error("error", error);
-        res.status(500).json({ message: "Server Error" });
+        return res.status(500).json({ message: "Server Error" });
     }
 };
-exports.getdashborad = getdashborad;
+exports.getDashboard = getDashboard;

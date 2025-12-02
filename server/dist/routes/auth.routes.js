@@ -9,5 +9,5 @@ router.post("/addtransaction", auth_controller_1.addTransaction);
 router.get("/getTransaction", auth_controller_1.getTransaction);
 router.post("/addcategory", auth_controller_1.addCategoris);
 router.get("/getcategory", auth_controller_1.getCategoris);
-router.get("/getdashborad", auth_controller_1.getdashborad);
+router.get("/getdashboard", auth_controller_1.getDashboard);
 exports.default = router;

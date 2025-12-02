@@ -139,29 +139,37 @@ export const getCategoris = async (req:Request,res:Response)=>{
     }
 }
 
-export const getdashborad = async(req:Request,res:Response)=>{
-    try {
-        const userId = req.body.id; 
-        const all_transactions = await prisma.transaction.findMany({
-            where:{userId},
-        });
-        const incomeTransaction =  all_transactions.filter((x)=>x.transaction_type=='CR');
-        let totalIncome = 0;
-        incomeTransaction.forEach(x=>{
-            totalIncome = totalIncome + x.amount;
-        });
-         const expenceTransaction =  all_transactions.filter((x)=>x.transaction_type=='DR');
-         console.log("expenceTransaction",expenceTransaction);
-         
-        let totalExpence = 0;
-        expenceTransaction.forEach(x=>{
-            totalExpence = totalExpence + x.amount;
-        });
-        const totalBalance = totalIncome - totalExpence;
-        let data = {totalIncome,totalExpence,totalBalance}
-        res.status(200).json({message:'Data gets Successfully',data})        
-    } catch (error) {
-         console.error("error",error);
-        res.status(500).json({message:"Server Error"});
+export const getDashboard = async (req: Request, res: Response) => {
+  try {
+    const userId = req.body.id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
     }
-}
+
+    // Query all transactions once
+    const transactions = await prisma.transaction.findMany({
+      where: { userId },
+      select: { amount: true, transaction_type: true }
+    });
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    transactions.forEach(t => {
+      if (t.transaction_type === "CR") totalIncome += t.amount;
+      if (t.transaction_type === "DR") totalExpense += t.amount;
+    });
+
+    const totalBalance = totalIncome - totalExpense;
+
+    return res.status(200).json({
+      message: "Data fetched successfully",
+      data: { totalIncome, totalExpense, totalBalance }
+    });
+
+  } catch (error) {
+    console.error("error", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
