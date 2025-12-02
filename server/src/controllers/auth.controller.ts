@@ -138,3 +138,30 @@ export const getCategoris = async (req:Request,res:Response)=>{
         res.status(500).json({message:"Server Error"});
     }
 }
+
+export const getdashborad = async(req:Request,res:Response)=>{
+    try {
+        const userId = req.body.id; 
+        const all_transactions = await prisma.transaction.findMany({
+            where:{userId},
+        });
+        const incomeTransaction =  all_transactions.filter((x)=>x.transaction_type=='CR');
+        let totalIncome = 0;
+        incomeTransaction.forEach(x=>{
+            totalIncome = totalIncome + x.amount;
+        });
+         const expenceTransaction =  all_transactions.filter((x)=>x.transaction_type=='DR');
+         console.log("expenceTransaction",expenceTransaction);
+         
+        let totalExpence = 0;
+        expenceTransaction.forEach(x=>{
+            totalExpence = totalExpence + x.amount;
+        });
+        const totalBalance = totalIncome - totalExpence;
+        let data = {totalIncome,totalExpence,totalBalance}
+        res.status(200).json({message:'Data gets Successfully',data})        
+    } catch (error) {
+         console.error("error",error);
+        res.status(500).json({message:"Server Error"});
+    }
+}
