@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
+// import dashboardRouter from "./routes/dashboard.routes";
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
@@ -18,6 +19,7 @@ app.use((0, cors_1.default)({
 // app.options("*", cors()); // ✅ fix preflight
 app.use(express_1.default.json());
 app.use("/auth", auth_routes_1.default); // ✅ also fix route prefix
+// app.use("/dashboard", dashboardRouter); // ✅ also fix route prefix
 app.get("/", (req, res) => {
     res.send("API Running ✅");
 });

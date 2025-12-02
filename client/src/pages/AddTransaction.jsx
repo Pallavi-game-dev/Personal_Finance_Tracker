@@ -1,26 +1,45 @@
-import { useState } from "react";
-import { useTransactions } from "../context/TransactionContext";
+import { useState ,useEffect } from "react";
+import API from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function AddTransaction() {
-  const { addTransaction } = useTransactions();
-
   const [form, setForm] = useState({
     title: "",
     amount: "",
-    type: "income"
+    type: "income",
+    category:""
   });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!form.title || !form.amount) return;
-
-    addTransaction({
-      id: Date.now(),
-      ...form
+  const [categoriesList,setCategoriesList]=useState([])
+  const { user } = useAuth();
+  useEffect(()=>{
+    categories().then(data=>{
+      setCategoriesList(data);
     });
+  },[]);
 
-    setForm({ title: "", amount: "", type: "income" });
+  const  handleSubmit = async(e) => {
+    e.preventDefault();
+    if (!form.title || !form.amount) {return;}
+    try {
+     console.log("CurrentUser user",user);
+     
+      const body ={
+        "title":form.title,
+        "amount":parseFloat(form.amount),
+        "tranaction_type":form.tranaction_type,
+        "category":Number(form.category),
+        "user_id":Number(user.id)
+      }
+       console.log("CurrentUser body",body);
+      const res = await API.post("/addtransaction", body);
+      console.log(res);
+    } catch (err) {
+      alert(err?.response?.data?.message || "Transaction add failed");
+    }
   };
+
+ 
+
 
   return (
     <form
@@ -47,11 +66,24 @@ export default function AddTransaction() {
 
       <select
         className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
-        value={form.type}
-        onChange={(e) => setForm({ ...form, type: e.target.value })}
+        onChange={(e) => setForm({ ...form, tranaction_type: e.target.value })}
       >
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
+        <option value="CR">Income</option>
+        <option value="DR">Expense</option>
+      </select>
+
+      <select
+        className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700"
+        onChange={(e) => setForm({ ...form, category: e.target.value })}
+      >
+        {categoriesList && categoriesList.map((item, index) => {
+            return (
+              <option value={item.id} key={index}>
+                {item.category}
+              </option>
+            );
+          })
+        }
       </select>
 
       <button
@@ -63,3 +95,13 @@ export default function AddTransaction() {
     </form>
   );
 }
+
+  async function categories(){
+     try {
+      const respons = await API.get('/getcategory')
+      return respons.data.data;
+    } catch (error) {
+       alert(error.response?.data?.message || "Categories is not available");
+    }
+   
+  }

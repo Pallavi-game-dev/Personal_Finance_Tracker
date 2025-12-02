@@ -47,7 +47,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.BudgetScalarFieldEnum = exports.TransactionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.BudgetScalarFieldEnum = exports.TransactionScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/library"));
 /**
  * Prisma Errors
@@ -103,6 +103,7 @@ exports.JsonNull = runtime.objectEnumValues.instances.JsonNull;
 exports.AnyNull = runtime.objectEnumValues.instances.AnyNull;
 exports.ModelName = {
     User: 'User',
+    Category: 'Category',
     Transaction: 'Transaction',
     Budget: 'Budget'
 };
@@ -119,18 +120,25 @@ exports.UserScalarFieldEnum = {
     id: 'id',
     email: 'email',
     password: 'password',
-    name: 'name'
+    name: 'name',
+    token: 'token'
+};
+exports.CategoryScalarFieldEnum = {
+    id: 'id',
+    category: 'category'
 };
 exports.TransactionScalarFieldEnum = {
     id: 'id',
+    title: 'title',
     amount: 'amount',
-    category: 'category',
+    category_id: 'category_id',
     date: 'date',
-    userId: 'userId'
+    userId: 'userId',
+    transaction_type: 'transaction_type'
 };
 exports.BudgetScalarFieldEnum = {
     id: 'id',
-    category: 'category',
+    category_id: 'category_id',
     limit: 'limit',
     userId: 'userId'
 };

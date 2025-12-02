@@ -5,4 +5,8 @@ const auth_controller_1 = require("../controllers/auth.controller");
 const router = (0, express_1.Router)();
 router.post("/register", auth_controller_1.register);
 router.post("/login", auth_controller_1.login);
+router.post("/addtransaction", auth_controller_1.addTransaction);
+router.get("/getTransaction", auth_controller_1.getTransaction);
+router.post("/addcategory", auth_controller_1.addCategoris);
+router.get("/getcategory", auth_controller_1.getCategoris);
 exports.default = router;

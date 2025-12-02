@@ -8,3 +8,8 @@
 * 🟢 You can import this file directly.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TransactionType = void 0;
+exports.TransactionType = {
+    DR: 'DR',
+    CR: 'CR'
+};

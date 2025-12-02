@@ -3,6 +3,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
+// import dashboardRouter from "./routes/dashboard.routes";
 dotenv.config();
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors({
 // app.options("*", cors()); // ✅ fix preflight
 app.use(express.json());
 app.use("/auth", authRoutes); // ✅ also fix route prefix
+// app.use("/dashboard", dashboardRouter); // ✅ also fix route prefix
 
 app.get("/", (req, res) => {
   res.send("API Running ✅");
