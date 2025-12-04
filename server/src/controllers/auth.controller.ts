@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient, TransactionType } from "../generated/prisma/client";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -91,7 +91,9 @@ export const addTransaction = async(req:Request,res:Response)=>{
 export const getTransaction = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.query.id);
-
+        if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+        }
     const data = await prisma.transaction.findMany({
       where: { userId },
       include: {
@@ -173,3 +175,80 @@ export const getDashboard = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
+export const getfinancereport=async(req:Request,res:Response)=>{
+    try {
+
+        const userId = req.body.id;
+        const year = req.body.year;
+        const userExist = await prisma.user.findFirst({where:userId})
+         if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        let startDate = new Date(year,0,1);
+        let endDate = new Date(year,11, 31, 23, 59, 59, 999);
+        const getExpenceMonthWise = await prisma.transaction.findMany(
+            {
+                where:{
+                    userId:userId,
+                    transaction_type:TransactionType.CR,
+                    date:{
+                        gte:startDate,
+                        lte:endDate
+                    }
+                },
+                orderBy:{
+                    date:'asc'
+                }
+            }
+        )
+        const getIncomeMonthWise = await prisma.transaction.findMany(
+            {
+                where:{
+                    userId:userId,
+                    transaction_type:TransactionType.DR,
+                    date:{
+                        gte:startDate,
+                        lte:endDate
+                    }
+                },
+                orderBy:{
+                    date:'asc'
+                }
+            }
+        )
+        res.status(200).json({
+            message:'Data get succesfully',
+            data:{getExpenceMonthWise,getIncomeMonthWise}
+        })
+        
+    } catch (error) {
+        console.error("error",error);
+        res.status(500).json({message:"Server Error"});
+    }
+}
+
+export const getreportcategorywise = async(req:Request,res:Response)=>{
+    try {
+        const {userId,month,year} = req.body;
+        const userExist = await prisma.user.findFirst({where:userId})
+         if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        const data = await prisma.transaction.findMany({
+            select:{
+                category:true
+            },
+            where:{
+                userId:userId,
+                transaction_type:TransactionType.DR
+            }
+        })
+
+        
+        
+    } catch (error) {
+        console.error("error",error);
+        res.status(500).json({message:"Server Error"});
+    }
+}

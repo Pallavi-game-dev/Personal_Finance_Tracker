@@ -10,4 +10,5 @@ router.get("/getTransaction", auth_controller_1.getTransaction);
 router.post("/addcategory", auth_controller_1.addCategoris);
 router.get("/getcategory", auth_controller_1.getCategoris);
 router.get("/getdashboard", auth_controller_1.getDashboard);
+router.get("/getfinancereport", auth_controller_1.getfinancereport);
 exports.default = router;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDashboard = exports.getCategoris = exports.addCategoris = exports.getTransaction = exports.addTransaction = exports.login = exports.register = exports.prisma = void 0;
+exports.getfinancereport = exports.getDashboard = exports.getCategoris = exports.addCategoris = exports.getTransaction = exports.addTransaction = exports.login = exports.register = exports.prisma = void 0;
 const client_1 = require("../generated/prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -85,6 +85,9 @@ exports.addTransaction = addTransaction;
 const getTransaction = async (req, res) => {
     try {
         const userId = Number(req.query.id);
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
         const data = await exports.prisma.transaction.findMany({
             where: { userId },
             include: {
@@ -164,3 +167,49 @@ const getDashboard = async (req, res) => {
     }
 };
 exports.getDashboard = getDashboard;
+const getfinancereport = async (req, res) => {
+    try {
+        const userId = req.body.id;
+        const year = req.body.year;
+        if (!userId) {
+            return res.status(401).json({ message: "User Not Exist" });
+        }
+        let startDate = new Date(year, 0, 1);
+        let endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+        const getExpenceMonthWise = await exports.prisma.transaction.findMany({
+            where: {
+                userId: userId,
+                transaction_type: client_1.TransactionType.CR,
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            orderBy: {
+                date: 'asc'
+            }
+        });
+        const getIncomeMonthWise = await exports.prisma.transaction.findMany({
+            where: {
+                userId: userId,
+                transaction_type: client_1.TransactionType.DR,
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            orderBy: {
+                date: 'asc'
+            }
+        });
+        res.status(200).json({
+            message: 'Data get succesfully',
+            data: { getExpenceMonthWise, getIncomeMonthWise }
+        });
+    }
+    catch (error) {
+        console.error("error", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+exports.getfinancereport = getfinancereport;
