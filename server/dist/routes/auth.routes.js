@@ -11,4 +11,7 @@ router.post("/addcategory", auth_controller_1.addCategoris);
 router.get("/getcategory", auth_controller_1.getCategoris);
 router.get("/getdashboard", auth_controller_1.getDashboard);
 router.get("/getfinancereport", auth_controller_1.getfinancereport);
+router.get("/getreportcategorywise", auth_controller_1.getreportcategorywise);
+router.get("/deletecategory", auth_controller_1.deletecategory);
+router.post("/addbugets", auth_controller_1.addbugets);
 exports.default = router;

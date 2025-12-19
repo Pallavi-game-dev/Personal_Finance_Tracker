@@ -22,11 +22,14 @@ model User{
   token        String?
   transactions Transaction[]
   budgets      Budget[] 
+  category      Category[] 
 }
 
 model Category {
   id        Int      @id @default(autoincrement())
-  category  String    @unique
+  category  String   
+  user            User     @relation(fields: [userId], references: [id])
+  userId          Int
   transactions Transaction[]
   budgets Budget[]
 }

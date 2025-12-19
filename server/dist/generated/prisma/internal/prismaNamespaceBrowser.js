@@ -97,7 +97,8 @@ exports.UserScalarFieldEnum = {
 };
 exports.CategoryScalarFieldEnum = {
     id: 'id',
-    category: 'category'
+    category: 'category',
+    userId: 'userId'
 };
 exports.TransactionScalarFieldEnum = {
     id: 'id',

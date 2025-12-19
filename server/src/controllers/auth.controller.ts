@@ -115,14 +115,17 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const addCategoris = async (req:Request,res:Response)=>{
     try {
-        const {category} = req.body;
-        console.log("category",category)
-        const checkExist = await prisma.category.findUnique({where:{category}})
+        const {id,category} = req.body
+        const userExist = await prisma.user.findFirst({where:{id:id}})
+            if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        const checkExist = await prisma.category.findFirst({where:{category:category,userId:id}})
         if(checkExist){
             return res.status(401).json({message:"Category Already Exists"});
         }
         const newcategory = await prisma.category.create({
-            data:{category}
+            data:{userId:id,category:category}
         })
         res.status(200).json({message:"Category added Successfully",data:newcategory})
     } catch (error) {
@@ -132,8 +135,16 @@ export const addCategoris = async (req:Request,res:Response)=>{
 }
 export const getCategoris = async (req:Request,res:Response)=>{
     try {
-       
-        const data = await prisma.category.findMany();
+        const {id} = req.body
+        const userExist = await prisma.user.findFirst({where:{id:id}})
+            if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        const data = await prisma.category.findMany({
+            where:{
+                userId:id
+            }
+        });
         res.status(200).json({message:"Category added Successfully",data:data})
     } catch (error) {
         console.error("error",error);
@@ -148,7 +159,10 @@ export const getDashboard = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
-
+    const userExist = await prisma.user.findFirst({where:{id:userId}})
+        if(!userExist){
+        return res.status(401).json({message:"User Not Exist"});
+    }
     // Query all transactions once
     const transactions = await prisma.transaction.findMany({
       where: { userId },
@@ -181,7 +195,7 @@ export const getfinancereport=async(req:Request,res:Response)=>{
 
         const userId = req.body.id;
         const year = req.body.year;
-        const userExist = await prisma.user.findFirst({where:userId})
+        const userExist = await prisma.user.findFirst({where:{id:userId}})
          if(!userExist){
             return res.status(401).json({message:"User Not Exist"});
         }
@@ -218,7 +232,7 @@ export const getfinancereport=async(req:Request,res:Response)=>{
             }
         )
         res.status(200).json({
-            message:'Data get succesfully',
+            message:'Data fetch succesfully',
             data:{getExpenceMonthWise,getIncomeMonthWise}
         })
         
@@ -231,24 +245,105 @@ export const getfinancereport=async(req:Request,res:Response)=>{
 export const getreportcategorywise = async(req:Request,res:Response)=>{
     try {
         const {userId,month,year} = req.body;
-        const userExist = await prisma.user.findFirst({where:userId})
+        const userExist = await prisma.user.findFirst({where: { id: userId }})
          if(!userExist){
             return res.status(401).json({message:"User Not Exist"});
         }
-        const data = await prisma.transaction.findMany({
-            select:{
-                category:true
-            },
-            where:{
-                userId:userId,
-                transaction_type:TransactionType.DR
-            }
-        })
+      // Month-year range
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
 
-        
+        // Fetch DR (expense) transactions
+        const transactions = await prisma.transaction.findMany({
+        where: {
+            userId,
+            transaction_type: TransactionType.DR,
+            date: {
+                gte: startDate,
+                lte: endDate
+            }
+        },
+            select: {
+                amount: true,
+                category: { select: { id: true, category: true } }
+            }
+        });
+
+                // Group by category
+                const categoryMap:any = {};
+
+                transactions.forEach(tx => {
+                    const cat = tx.category.category;
+
+                    if (!categoryMap[cat]) {
+                        categoryMap[cat] = 0;
+                    }
+
+                    categoryMap[cat] += tx.amount;
+                });
+
+                // Convert to array format (chart friendly)
+                const result = Object.keys(categoryMap).map(cat => ({
+                    category: cat,
+                    total: categoryMap[cat]
+                }));
+                res.status(200).json({
+                    message:'Data fetch succesfully',
+                    data:result
+                })
         
     } catch (error) {
         console.error("error",error);
         res.status(500).json({message:"Server Error"});
+    }
+}
+
+export const deletecategory = async(req:Request,res:Response)=>{
+    try {
+        const{userId,category_id} = req.body;
+        const userExist = await prisma.user.findFirst({where: { id: userId }})
+         if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        
+        
+
+    } catch (error) {
+        
+    }
+}
+export const addbugets = async(req:Request,res:Response)=>{
+    try {
+        const{userId,category_id,limit} = req.body;
+        const userExist = await prisma.user.findFirst({where: { id: userId }})
+         if(!userExist){
+            return res.status(401).json({message:"User Not Exist"});
+        }
+        const categoryExist = await prisma.category.findFirst(
+            {
+                where:{
+                    id:category_id,
+                    userId:userId
+                }
+            }
+        )
+        if(!categoryExist){
+            return res.status(401).json({message:"Category Not Exist"});
+        }
+        const data = await prisma.budget.create({
+            data:{userId:userId,category_id:category_id,limit:limit}
+        })
+        return res.status(200).json({message:"Budget added"});
+
+    } catch (error) {
+         console.error("error",error);
+        res.status(500).json({message:"Server Error"});
+    }
+}
+export const getbugets = async(req:Request,res:Response)=>{
+    try {
+        
+    } catch (error) {
+        
     }
 }
